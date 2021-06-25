@@ -1,0 +1,18 @@
+{
+  "name": "express_sqlite_boilerplate",
+  "version": "1.0.0",
+  "description": "A CRUD backend boilerplate using express and a sqlite database",
+  "main": "index.js",
+  "author": "Andrei-Florin Dogaru",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "create-db": "node seed/createTables.js",
+    "seed-db": "node seed/seedTables.js"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "sqlite3": "^5.0.2"
+  }
+}
