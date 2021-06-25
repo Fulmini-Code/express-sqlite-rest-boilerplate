@@ -10,6 +10,8 @@ Run in the command line **``` npm install ```** / **``` yarn install ```**
 
 ## Creating the databases
 
+Create in the root project a _**data**_ folder
+
 Run in the command line **``` npm run create-db ```** / **``` yarn create-db ```**
 
 ## Seeding the databases
