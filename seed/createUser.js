@@ -9,9 +9,6 @@ async function hashPassword(password) {
   return hashed;
 }
 
-const insertSQL =
-  "INSERT INTO users (username, email, password, isAdmin, isActive) VALUES (?,?,?,?,true);";
-
 const createUser = async () => {
   var params = {};
 
@@ -24,20 +21,21 @@ const createUser = async () => {
     }
   }
 
-  const paramsInsert = [
-    params["username"],
-    params["email"],
-    params["password"]
+  const dataInsert = {
+    username: params["username"],
+    email: params["email"],
+    password: params["password"]
       ? await hashPassword(params["password"])
       : await hashPassword("12345"),
-    params["isAdmin"],
-  ];
+    isAdmin: params["isAdmin"],
+    isActive: true,
+  };
 
-  db.run(insertSQL, paramsInsert, (err) => {
-    if (err) return console.error(err.message);
+  const rez = await db("users").insert(dataInsert);
 
-    console.log("User created successfully");
-  });
+  console.log(rez);
+
+  await db.destroy()
 };
 
 createUser();

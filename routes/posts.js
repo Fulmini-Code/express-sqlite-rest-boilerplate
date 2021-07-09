@@ -5,37 +5,35 @@ const db = require("../database");
 
 const { verifyToken } = require("../middleware/auth");
 
-router.get("/", [verifyToken], (req, res) => {
-  const sql = "SELECT * FROM posts";
-  let params = [];
-  db.all(sql, params, (error, rows) => {
-    if (error) {
-      res.status(400).json({ error: error.message });
-      return;
-    }
+router.get("/", [verifyToken], async (req, res) => {
+  try {
+    const rez = await db("posts").select();
     res.json({
       message: "success",
-      data: rows,
+      data: rez,
     });
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  db.destroy();
 });
 
-router.get("/:id", [verifyToken], (req, res) => {
-  const sql = "SELECT * FROM posts where id = ?";
-  let params = [req.params.id];
-  db.get(sql, params, (error, row) => {
-    if (error) {
-      res.status(400).json({ error: error.message });
-      return;
-    }
+router.get("/:id", [verifyToken], async (req, res) => {
+  try {
+    const rez = await db("posts").select().where("id", "=", req.params.id);
     res.json({
       message: "success",
-      data: row,
+      data: rez,
     });
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  db.destroy();
 });
 
-router.post("/", [verifyToken], (req, res, next) => {
+router.post("/", [verifyToken], async (req, res, next) => {
   var errors = [];
 
   if (!req.body.title) {
@@ -57,61 +55,51 @@ router.post("/", [verifyToken], (req, res, next) => {
     author: req.body.author,
   };
 
-  const sql = "INSERT INTO posts (title, body, author) VALUES (?,?,?);";
-  const params = [data.title, data.body, data.author];
-  db.run(sql, params, function (err, result) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
+  try {
+    const rez = await db("posts").insert(data);
     res.json({
       message: "success",
-      data: data,
-      id: this.lastID,
+      data: rez,
     });
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  db.destroy();
 });
 
-router.put("/:id", [verifyToken], (req, res, next) => {
+router.put("/:id", [verifyToken], async (req, res, next) => {
   let data = {
     title: req.body.title,
     body: req.body.body,
     author: req.body.author,
   };
 
-  const sql = `UPDATE posts SET 
-                      title = COALESCE(?,title), 
-                      body = COALESCE(?,body), 
-                      author = COALESCE(?,author) 
-                      where id = ?;`;
-  const params = [data.title, data.body, data.author, req.params.id];
-
-  db.run(sql, params, function (err, result) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
+  try {
+    const rez = await db("posts").where("id", "=", req.params.id).update(data);
     res.json({
       message: "success",
-      data: data,
-      changes: this.changes,
+      data: rez,
     });
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  db.destroy();
 });
 
-router.delete("/:id", [verifyToken], (req, res, next) => {
-  const sql = `DELETE FROM posts WHERE id = ?`;
-  const params = [req.params.id];
-  db.run(sql, params, function (err, result) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
+router.delete("/:id", [verifyToken], async (req, res, next) => {
+  try {
+    const rez = await db("posts").where("id", "=", req.params.id).del();
     res.json({
-      message: "deleted",
-      changes: this.changes,
+      message: "success",
+      data: rez,
     });
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  db.destroy();
 });
 
 module.exports = router;

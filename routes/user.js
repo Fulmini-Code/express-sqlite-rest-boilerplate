@@ -5,7 +5,7 @@ const router = express.Router();
 
 const db = require("../database");
 
-router.post("/generate_token", (req, res, next) => {
+router.post("/generate_token", async (req, res, next) => {
   var errors = [];
 
   if (!req.body.username) {
@@ -26,63 +26,60 @@ router.post("/generate_token", (req, res, next) => {
     password: req.body.password,
   };
 
-  const sql = "SELECT * FROM users where username = ?";
+  try {
+    const rez = await db("users").select().where("username", data.username);
 
-  let params = [data.username];
-  db.get(sql, params, (error, row) => {
-    if (error) {
-      res.status(400).json({ error: error.message });
-      return;
-    }
-
-    if (!row) {
+    if (rez.length === 0) {
       res.status(400).json({ error: "Wrong credentials" });
       return;
     }
-    const match = bcrypt.compareSync(data.password, row["password"]);
+
+    const match = bcrypt.compareSync(data.password, rez[0]["password"]);
     if (!match) {
       res.status(400).json({ error: "Wrong credentials" });
       return;
     }
     const jwtSecretKey = process.env.JWT_SECRET_KEY;
-    const token = jwt.sign({ userId: row["id"] }, jwtSecretKey, {
+    const token = jwt.sign({ userId: rez[0]["id"] }, jwtSecretKey, {
       expiresIn: "1h",
     });
     res.json({
       message: "success",
       token: token,
     });
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  db.destroy();
 });
 
-router.get("/", (req, res) => {
-  const sql = "SELECT * FROM users";
-  let params = [];
-  db.all(sql, params, (error, rows) => {
-    if (error) {
-      res.status(400).json({ error: error.message });
-      return;
-    }
+router.get("/", async (req, res) => {
+  try {
+    const rez = await db("users").select();
     res.json({
       message: "success",
-      data: rows,
+      data: rez,
     });
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  db.destroy();
 });
 
-router.get("/:id", (req, res) => {
-  const sql = "SELECT * FROM users where id = ?";
-  let params = [req.params.id];
-  db.get(sql, params, (error, row) => {
-    if (error) {
-      res.status(400).json({ error: error.message });
-      return;
-    }
+router.get("/:id", async (req, res) => {
+  try {
+    const rez = await db("users").select().where("id", "=", req.params.id);
     res.json({
       message: "success",
-      data: row,
+      data: rez,
     });
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  db.destroy();
 });
 
 // router.post("/", (req, res, next) => {
@@ -149,19 +146,18 @@ router.get("/:id", (req, res) => {
 //   });
 // });
 
-router.delete("/:id", (req, res, next) => {
-  const sql = `DELETE FROM users WHERE id = ?`;
-  const params = [req.params.id];
-  db.run(sql, params, function (err, result) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const rez = await db("users").where("id", "=", req.params.id).del();
     res.json({
-      message: "deleted",
-      changes: this.changes,
+      message: "success",
+      data: rez,
     });
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  db.destroy();
 });
 
 module.exports = router;

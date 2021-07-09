@@ -11,24 +11,21 @@ function verifyToken(req, res, next) {
 
       if (verified) {
         const userId = verified.userId;
-        const sql = "SELECT * FROM users where id = ?";
-        let params = [userId];
-        db.get(sql, params, (error, row) => {
-          if (error) {
-            res.status(401).json({ error: error.message });
-            return;
-          }
-          next();
-        });
+        db("users")
+          .select()
+          .where("id", "=", userId)
+          .then(() => next())
+          .catch((error) => res.status(400).json({ error: error.message }))
+          .finally(() => db.destroy());
       } else {
         // Access Denied
         res.status(401).send(error);
       }
     } catch (error) {
-        res.status(401).send(error);
+      res.status(401).send(error);
     }
   } else {
-    res.status(403).send('no token');
+    res.status(403).send("no token");
   }
 }
 
