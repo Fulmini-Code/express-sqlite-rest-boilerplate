@@ -16,7 +16,6 @@ router.get("/", [verifyToken], async (req, res) => {
     res.status(400).json({ error: error.message });
     return;
   }
-  db.destroy();
 });
 
 router.get("/:id", [verifyToken], async (req, res) => {
@@ -30,7 +29,6 @@ router.get("/:id", [verifyToken], async (req, res) => {
     res.status(400).json({ error: error.message });
     return;
   }
-  db.destroy();
 });
 
 router.post("/", [verifyToken], async (req, res, next) => {
@@ -65,7 +63,6 @@ router.post("/", [verifyToken], async (req, res, next) => {
     res.status(400).json({ error: error.message });
     return;
   }
-  db.destroy();
 });
 
 router.put("/:id", [verifyToken], async (req, res, next) => {
@@ -85,7 +82,6 @@ router.put("/:id", [verifyToken], async (req, res, next) => {
     res.status(400).json({ error: error.message });
     return;
   }
-  db.destroy();
 });
 
 router.delete("/:id", [verifyToken], async (req, res, next) => {
@@ -99,7 +95,6 @@ router.delete("/:id", [verifyToken], async (req, res, next) => {
     res.status(400).json({ error: error.message });
     return;
   }
-  db.destroy();
 });
 
 module.exports = router;
