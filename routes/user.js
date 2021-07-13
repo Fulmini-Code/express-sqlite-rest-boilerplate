@@ -45,11 +45,15 @@ router.post('/generate_token', async (req, res, next) => {
     }
     const jwtSecretKey = process.env.JWT_SECRET_KEY
     const token = jwt.sign({ userId: rez[0]['id'] }, jwtSecretKey, {
-      expiresIn: '1h',
+      expiresIn: '5m',
+    })
+    const refreshToken = jwt.sign({ userId: rez[0]['id'] }, jwtSecretKey, {
+      expiresIn: '2 days',
     })
     res.json({
       message: 'success',
       token: token,
+      refreshToken: refreshToken,
     })
   } catch (error) {
     res.status(400).json({ error: error.message })
