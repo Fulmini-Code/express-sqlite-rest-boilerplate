@@ -16,7 +16,6 @@ function verifyToken(req, res, next) {
           .where("id", "=", userId)
           .then(() => next())
           .catch((error) => res.status(400).json({ error: error.message }))
-          .finally(() => db.destroy());
       } else {
         // Access Denied
         res.status(401).send(error);
