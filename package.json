@@ -6,7 +6,7 @@
   "author": "Andrei-Florin Dogaru",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "create-user": "node seed/createUser.js",
     "knex": "knex"
   },
@@ -18,5 +18,8 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.6",
     "sqlite3": "^5.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }
