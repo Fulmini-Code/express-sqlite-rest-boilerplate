@@ -1,5 +1,4 @@
 const express = require('express')
-const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const router = express.Router()
 
@@ -8,54 +7,6 @@ const db = require('../database')
 const { verifyToken } = require('../middleware/auth')
 
 const saltRounds = 10
-
-router.post('/generate_token', async (req, res, next) => {
-  var errors = []
-
-  if (!req.body.username) {
-    errors.push('No username specified')
-  }
-
-  if (!req.body.password) {
-    errors.push('No password specified')
-  }
-
-  if (errors.length) {
-    res.status(400).json({ error: errors.join(', ') })
-    return
-  }
-
-  const data = {
-    username: req.body.username,
-    password: req.body.password,
-  }
-
-  try {
-    const rez = await db('users').select().where('username', data.username)
-
-    if (rez.length === 0) {
-      res.status(400).json({ error: 'Wrong credentials' })
-      return
-    }
-
-    const match = bcrypt.compareSync(data.password, rez[0]['password'])
-    if (!match) {
-      res.status(400).json({ error: 'Wrong credentials' })
-      return
-    }
-    const jwtSecretKey = process.env.JWT_SECRET_KEY
-    const token = jwt.sign({ userId: rez[0]['id'] }, jwtSecretKey, {
-      expiresIn: '1h',
-    })
-    res.json({
-      message: 'success',
-      token: token,
-    })
-  } catch (error) {
-    res.status(400).json({ error: error.message })
-    return
-  }
-})
 
 router.get('/', async (req, res) => {
   try {
