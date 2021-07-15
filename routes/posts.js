@@ -1,10 +1,11 @@
 const express = require("express");
-const router = express.Router();
+const router = express.Router();      //Routes manager
 
 const db = require("../database");
 
 const { verifyToken } = require("../middleware/auth");
 
+// Returns all the posts from the database
 router.get("/", [verifyToken], async (req, res) => {
   try {
     const rez = await db("posts").select();
@@ -18,6 +19,7 @@ router.get("/", [verifyToken], async (req, res) => {
   }
 });
 
+// Returns a post with the given id
 router.get("/:id", [verifyToken], async (req, res) => {
   try {
     const rez = await db("posts").select().where("id", "=", req.params.id);
@@ -31,6 +33,7 @@ router.get("/:id", [verifyToken], async (req, res) => {
   }
 });
 
+// Add a new post in the database
 router.post("/", [verifyToken], async (req, res, next) => {
   var errors = [];
 
@@ -65,6 +68,7 @@ router.post("/", [verifyToken], async (req, res, next) => {
   }
 });
 
+// Edit a post with the given id
 router.put("/:id", [verifyToken], async (req, res, next) => {
   let data = {
     title: req.body.title,
@@ -84,6 +88,7 @@ router.put("/:id", [verifyToken], async (req, res, next) => {
   }
 });
 
+// Delete a post with the given id
 router.delete("/:id", [verifyToken], async (req, res, next) => {
   try {
     const rez = await db("posts").where("id", "=", req.params.id).del();
