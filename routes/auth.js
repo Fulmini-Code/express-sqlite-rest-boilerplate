@@ -1,10 +1,10 @@
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const router = express.Router()
+const router = express.Router() //Routes manager
 
 const db = require('../database')
-
+// Generates a token and a refreshtoken for given user
 router.post('/generate_token', async (req, res, next) => {
   var errors = []
 
@@ -56,7 +56,7 @@ router.post('/generate_token', async (req, res, next) => {
     return
   }
 })
-
+// refreshtoken creates a new token for  given user
 router.post('/refresh_token', async (req, res, next) => {
   var errors = []
 
