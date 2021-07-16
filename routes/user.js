@@ -1,13 +1,13 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
-const router = express.Router()
+const router = express.Router() //Routes manager
 
 const db = require('../database')
 
 const { verifyToken } = require('../middleware/auth')
 
 const saltRounds = 10
-
+// Returns all users from the database
 router.get('/', async (req, res) => {
   try {
     const rez = await db('users').select('id', 'username', 'email', 'isAdmin')
@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
     return
   }
 })
-
+// Returns an user with the given id
 router.get('/:id', async (req, res) => {
   try {
     const rez = await db('users')
@@ -41,7 +41,7 @@ async function hashPassword(password) {
   const hashed = await bcrypt.hash(password, salt)
   return hashed
 }
-
+//Creates new user
 router.post('/', async (req, res, next) => {
   var errors = []
 
@@ -93,7 +93,7 @@ router.post('/', async (req, res, next) => {
     return
   }
 })
-
+// Edits an user with the given id
 router.put('/:id', [verifyToken], async (req, res, next) => {
   if (!req.body.email) {
     errors.push('No email specified')
@@ -116,7 +116,7 @@ router.put('/:id', [verifyToken], async (req, res, next) => {
     return
   }
 })
-
+//Deletes an user with given id
 router.delete('/:id', [verifyToken], async (req, res, next) => {
   try {
     const rez = await db('users').where('id', '=', req.params.id).del()
